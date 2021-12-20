@@ -8,7 +8,9 @@ func main() {
 
 	// 演示for-range遍历数组
 	heroes := [...]string{"宋江", "吴用", "卢俊义"}
-	// 使用常规的方式遍历，我不写了..
+	for i := 0; i < len(heroes); i++ {
+		fmt.Printf("i=%v v=%v\n", i, heroes[i])
+	}
 
 	for i, v := range heroes {
 		fmt.Printf("i=%v v=%v\n", i, v)
