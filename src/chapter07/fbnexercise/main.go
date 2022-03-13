@@ -7,10 +7,10 @@ import (
 func fbn(n int) []uint64 {
 	// 声明一个切片，切片大小 n
 	fbnSlice := make([]uint64, n)
-	// 第一个数和第二个数的斐波那契 为1
+	// 第一个数和第二个数的 为1
 	fbnSlice[0] = 1
 	fbnSlice[1] = 1
-	//进行for循环来存放斐波那契的数列
+	//进行for循环来存放的数列
 	for i := 2; i < n; i++ {
 		fbnSlice[i] = fbnSlice[i-1] + fbnSlice[i-2]
 	}

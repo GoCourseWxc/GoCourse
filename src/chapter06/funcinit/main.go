@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	//引入包
-	"chapter06/funcinit/utils"
+	"GoCourse/src/chapter06/funcinit/utils"
 )
 
 var age = test()

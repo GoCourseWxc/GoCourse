@@ -41,21 +41,21 @@ func main() {
 	fmt.Printf(now.Format("2006"))
 	fmt.Println()
 
-	//需求，每隔1秒中打印一个数字，打印到100时就退出
-	//需求2: 每隔0.1秒中打印一个数字，打印到100时就退出
-	// i := 0
-	// for {
-	// 	i++
-	// 	fmt.Println(i)
-	// 	//休眠
-	// 	//time.Sleep(time.Second)
-	// 	time.Sleep(time.Millisecond * 100)
-	// 	if i == 100 {
-	// 		break
-	// 	}
-	// }
+	// 需求，每隔1秒中打印一个数字，打印到100时就退出
+	// 需求2: 每隔0.1秒中打印一个数字，打印到100时就退出
+	i := 0
+	for {
+		i++
+		fmt.Println(i)
+		// 休眠
+		// time.Sleep(time.Second)
+		time.Sleep(time.Millisecond * 100)
+		if i == 100 {
+			break
+		}
+	}
 
-	//Unix和UnixNano的使用
+	// Unix和UnixNano的使用
 	fmt.Printf("unix时间戳=%v unixnano时间戳=%v\n", now.Unix(), now.UnixNano())
-
+	// unix时间戳=1647093474 unixnano时间戳=1647093474377446500
 }

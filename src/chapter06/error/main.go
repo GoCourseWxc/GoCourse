@@ -7,12 +7,12 @@ import (
 )
 
 func test() {
-	//使用defer + recover 来捕获和处理异常
+	// 用defer + recover 来捕获和处理异常
 	defer func() {
 		err := recover() // recover()内置函数，可以捕获到异常
 		if err != nil {  // 说明捕获到错误
 			fmt.Println("err=", err)
-			//这里就可以将错误信息发送给管理员....
+			// 这里就可以将错误信息发送给管理员....
 			fmt.Println("发送邮件给admin@sohu.com~")
 		}
 	}()
@@ -47,13 +47,13 @@ func test02() {
 func main() {
 
 	//测试
-	// test()
+	test()
 	// for {
 	// 	fmt.Println("main()下面的代码...")
 	// 	time.Sleep(time.Second)
 	// }
 	fmt.Println(time.Now())
-	//测试自定义错误的使用
+	// 测试自定义错误的使用
 
 	test02()
 	fmt.Println("main()下面的代码...")
