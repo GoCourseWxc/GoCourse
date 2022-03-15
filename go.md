@@ -3377,3 +3377,148 @@ func main() {
 }
 ```
 
+
+
+## chapter15 单元测试
+
+### 单元测试
+
+####单元测试介绍
+
+go语言中自带有一个轻量级的测试框架testing 和自带的 go test 命令来实现单元测试的和性能测试，testing框架和其他语言中的测试框架框架类似，可以基于这个框架写针对相应函数的测试用例，也可以基于该框架写相应的压力测试用例。
+
+通过单元测试可以解决如下问题
+
+- 确保每个函数时可运行的，并且运行结果是正确的
+- 确保写出来的代码性能是好的
+- 单元测试能及时的发现程序设计或实现的逻辑错误，使问题及早暴露，便于问题的定位解决，而性能测试的重点在于发现程序设计上的一些问题，让程序能够在高并发的情况下还能保持稳定。
+
+
+
+
+
+#### #### 单元测试快速入门
+
+![image-20220316002048219](C:\Users\ａｄｍｉｎ\AppData\Roaming\Typora\typora-user-images\image-20220316002048219.png)
+
+- 测试用例文件名必须以 _test.go 结尾。比如 cal_test.go, cal 不是固定的
+
+- 测试用例函数必须以 Test 开头，一般来说就是 Test + 被测试的函数名，比如 TestAddUpper
+
+- TestAddUpper(t *testing T) 的形参类型必须是 *testing.T
+
+- 一个测试用例文件中，可以有多个测试用例函数
+
+- 运行测试用例指令
+
+  - go test [如果运行正确，无日志，错误时，会输出日志]
+  - go test -v [运行正确或是错误，都输出日志]
+
+- 当出现错误时，可以使用 t.Fatalf 来格式化输出错误信息，并退出程序
+
+- t.Logf 方法可以输出相应的日志
+
+- 测试用例函数，并没有放在main函数中
+
+- PASS表示测试用例运行成功，FAIL表示测试用例运行失败
+
+- 测试单个文件，一定要带上被测试的原文件
+
+  - go test -v cal_test.go cal.go
+
+- 测试单个方法
+
+  go test -v test.run TestAddUser
+
+#### 单元测试综合案例
+
+```go
+type Monster struct {
+	Name string
+	Age int
+	Skill string
+} 
+
+//给Monster绑定方法Store, 可以将一个Monster变量(对象),序列化后保存到文件中
+
+func (this *Monster) Store() bool {
+
+	//先序列化
+	data, err := json.Marshal(this)
+	if err != nil {
+		fmt.Println("marshal err =", err)
+		return false
+	} 
+
+	//保存到文件
+	filePath := "d:/monster.ser"
+	err = ioutil.WriteFile(filePath, data, 0666)
+	if err != nil {
+		fmt.Println("write file err =", err)
+		return false
+	}
+	return true
+}
+
+
+// 给Monster绑定方法ReStore, 可以将一个序列化的Monster,从文件中读取，
+// 并反序列化为Monster对象,检查反序列化，名字正确
+func (this *Monster) ReStore() bool {
+
+	//1. 先从文件中，读取序列化的字符串
+	filePath := "d:/monster.ser"
+	data, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		fmt.Println("ReadFile err =", err)
+		return false
+	}
+
+	//2.使用读取到data []byte ,对反序列化
+	err = json.Unmarshal(data, this)
+	if err != nil {
+		fmt.Println("UnMarshal err =", err)
+		return false
+	}
+	return true
+}
+
+```
+
+```go
+// 测试用例,测试 Store 方法
+func TestStore(t *testing.T) {
+
+	// 先创建一个Monster 实例
+	monster := &Monster{
+		Name : "红孩儿",
+		Age :10,
+		Skill : "吐火.",
+	}
+	res := monster.Store()
+	if !res {
+		t.Fatalf("monster.Store() 错误，希望为=%v 实际为=%v", true, res)
+	}
+	t.Logf("monster.Store() 测试成功!")
+}
+
+func TestReStore(t *testing.T) {
+
+	// 测试数据是很多，测试很多次，才确定函数，模块..
+	
+	// 先创建一个 Monster 实例 ， 不需要指定字段的值
+	var monster = &Monster{}
+	res := monster.ReStore() 
+	if !res {
+		t.Fatalf("monster.ReStore() 错误，希望为=%v 实际为=%v", true, res)
+	}
+
+	// 进一步判断
+	if monster.Name != "红孩儿" {
+		t.Fatalf("monster.ReStore() 错误，希望为=%v 实际为=%v", "红孩儿", monster.Name)
+	}
+
+	t.Logf("monster.ReStore() 测试成功!") 
+}
+
+```
+
