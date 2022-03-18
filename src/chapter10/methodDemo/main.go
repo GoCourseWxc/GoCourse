@@ -38,7 +38,7 @@ func (p Person) getSum(n1 int, n2 int) int {
 	return n1 + n2
 }
 
-//给Person类型绑定一方法
+// 给Person类型绑定一方法
 func (person Person) test() {
 	person.Name = "jack"
 	fmt.Println("test() name=", person.Name) // 输出jack
