@@ -2,7 +2,7 @@ package main
 
 import "fmt"
 
-//结构体
+// 结构体
 type Point struct {
 	x int
 	y int
