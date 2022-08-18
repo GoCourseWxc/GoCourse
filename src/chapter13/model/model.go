@@ -1,4 +1,6 @@
-package main
+package model
+
+import "fmt"
 
 type Customer struct {
 	Id     int
@@ -29,6 +31,8 @@ func NewCustomer2(name string, gender string, age int, phone string, email strin
 		Email:  email,
 	}
 }
-func main() {
 
+func (this Customer) GetInfo() string {
+	info := fmt.Sprintf("%v\t%v\t%v\t%v\t%v\t%v\t", this.Id, this.Name, this.Gender, this.Age, this.Phone, this.Email)
+	return info
 }

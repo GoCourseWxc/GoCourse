@@ -17,6 +17,7 @@ type customerView struct {
 
 func (this *customerView) list() {
 	// 获取当前所有客户信息
+
 	customers := this.customerService.List()
 	fmt.Println("===========================4.客户列表==============================")
 	fmt.Println("编号\t姓名\t性别\t年龄\t电话\t邮箱")
@@ -60,17 +61,24 @@ func (this *customerView) add() {
 func (this *customerView) delete() {
 	fmt.Println("===========================3.删除客户==============================")
 	fmt.Println("请选择待删除客户编号(-1退出)：")
-	id := -1 
+	id := -1
 	if id == -1 {
 		return // 放弃删除操作
 	}
 	fmt.Println("确认是否删除(Y/N):")
 	choice := ""
 	fmt.Println(choice)
-	if choice == "y" || choice == "Y"
+	if choice == "y" || choice == "Y" {
+		if this.customerService.Delete(id) {
+			fmt.Println("===========================刪除完成==============================")
+		} else {
+			fmt.Println("===========================刪除失败输入的id不存在==============================")
+		}
+	}
 }
 
 func (this *customerView) MainMenu() {
+
 	// 显示这个主菜单
 	for {
 
@@ -85,15 +93,15 @@ func (this *customerView) MainMenu() {
 
 		switch this.key {
 		case "1":
-			fmt.Print(3)
+			this.add()
 		case "2":
-			fmt.Print(3)
+			//
 		case "3":
-			fmt.Print(3)
+			this.delete()
 		case "4":
-			fmt.Print(3)
+			this.list()
 		case "5":
-			fmt.Print(3)
+			this.loop = false
 		default:
 			fmt.Println("请输入正确选项")
 		}
@@ -109,5 +117,6 @@ func main() {
 		key:  "",
 		loop: true,
 	}
+	customerView.customerService = service.NewCustomerService()
 	customerView.MainMenu()
 }
