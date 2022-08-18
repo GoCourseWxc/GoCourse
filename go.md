@@ -1,4 +1,14 @@
+## chapter01
 
+### go编译和运行说明
+
+- go源文件，通过编译器将其编译成机器可识别的二进制码文件
+- 在该源文件目录下，通过go build 对 hello.go 文件进行编译。可以指定生成的可执行文件名，在windows下，必须是.exe后缀
+- 如果程序无误会生成一个二进制可执行文件
+- 如果程序有误会报那一行出现的错误
+- 运行的两种形式
+	- 执行运行生成的go程序，hello.exe
+	- 通过运行工具 go run 对源代码文件进行运行
 
 ## chapter02
 ### go 语言 转义字符 （escape char)
@@ -10,6 +20,30 @@
 | `\\`     | 一个\                      |
 | `\"`     | 一个"                      |
 | \r       | 回车符                     |
+
+```go
+func main() {
+	// 演示转义字符的使用 \t
+	fmt.Println("tom\tjack")
+
+	// 如果希望一次性注释 ctrl + / 第一次表示注释，第二次表示取消注释
+	fmt.Println("hello\nworld")
+	fmt.Println("C:\\Users\\Administrator\\Desktop\\Go语言核心编程课程\\资料")
+	fmt.Println("tom说\"i love you\"")
+
+	// \r 回车,从当前行的最前面开始输出，覆盖掉以前内容
+	fmt.Println("天龙八部雪山飞狐\r张飞厉害")
+
+	fmt.Println("helloworldhelloworldhelloworldhelloworl\n",
+		"dhelloworldhelloworldhelloworldhelloworldhelloworldhellowor\n",
+		"ldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworl\n",
+		"dhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhel\n",
+		"loworldhelloworldhelloworldhelloworldhelloworldhelloworldhellowor\n",
+		"ldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworld")
+
+	// var num = 2 + 4 * 5
+}
+```
 
 ### 注释
 
@@ -49,8 +83,11 @@
 - 使用 gofmt 来进行格式化
 - 
 
+### golang 标准库 API文档
 
-
+- API是Golang提供的基本编程接口
+- Go语言提供了大量的标准库
+- [Golang中文网](https://studygolang.com/pkgdoc)
 
 
 ### chapter02 总结
@@ -100,6 +137,83 @@ GOPATH：就是goland工作目录，所有项目源码都在这个目录下
 - 变量 = 变量名 + 值 + 数据类型
 - Goland的变量如果没有赋初始值，编译器会使用默认值，比如int默认值0，string默认值为空串，小数默认为0
 
+### 变量的声明，初始化和赋值
+
+#### 变量声明
+
+声明变量的一般形式是使用 var 关键字：
+
+```go
+var name type
+```
+
+其中，var 是声明变量的关键字，name 是变量名，type 是变量的类型。
+
+**标准格式**
+
+```go
+var 变量名 变量类型
+```
+
+批量格式
+
+```go
+var (
+    a int
+    b string
+    c []float32
+    d func() bool
+    e struct {
+        x int
+    }
+)
+```
+
+简短格式
+
+```go
+名字 := 表达式
+```
+
+需要注意的是，简短模式（short variable declaration）有以下限制：
+
+- 定义变量，同时显式初始化。
+- 不能提供数据类型。
+- 只能用在函数内部
+
+#### 初始化变量
+
+```
+// 变量名 类型 = 表达式
+var hp = 10
+hb := 10
+```
+
+
+
+#### 给变量赋值
+
+```go
+var a int = 100
+var b int = 200
+b, a = a, b
+```
+
+#### 匿名变量
+
+```go
+func GetData() (int, int) {
+    return 100, 200
+}
+func main(){
+    a, _ := GetData()
+    _, b := GetData()
+    fmt.Println(a, b)
+}
+```
+
+
+
 #### 程序中 + 号的使用
 
 - 当左右两边都是数值型时，则做加法运算
@@ -134,7 +248,7 @@ GOPATH：就是goland工作目录，所有项目源码都在这个目录下
 
   
 
-- golang 程序中整型变量在使用时，遵守保小不保大的原则
+- golang 程序中整型变量在使用时，遵守保小不保大的原则,即在保证程序正确运行下，尽量使用占用内存空间小的数据类型
 
 - bit：计算机中的最小的存储单位。byte：计算机中基本存储单元。
 
@@ -1072,17 +1186,60 @@ func main() {
 
 - 函数的命名遵循表示符命名规范，首字母不能是数字，首字母大写可被其他包访问。
 
--  函数中的变量是局部的。
+-  函数中的变量是局部的，函数外不生效。
 
 - 基本数据类型和数组默认都是值传递的，即进行值拷贝。
 
 - 函数内的变量能修改函数外的变量，可以传入变量的地址&，函数内以指针的方式操作变量
 
+  ```go
+  // n1 就是 *int 类型
+  func test03(n1 *int) {
+  	fmt.Printf("n1的地址 %v\n", &n1)
+  	*n1 = *n1 + 10
+  	fmt.Println("test03() n1= ", *n1) // 30
+  }
+  ```
+
+  
+
 - go函数不支持函数重载
 
 - 在go中，函数也是一种数据类型，可以赋值给一个变量，则该变量就是一个函数类型的变量，通过该变量可以对函数调用
 
+  ```go
+  func getSum(n1 int, n2 int) int {
+  	return n1 + n2
+  }
+  
+  a := getSum
+  fmt.Printf("a的类型%T, getSum类型是%T\n", a, getSum)
+  
+  res := a(10, 40) // 等价  res := getSum(10, 40)
+  fmt.Println("res=", res)
+  ```
+
+  
+
 - 函数既然是一种数据类型，在go中，函数可以作为形参
+
+  ```go
+  func getSum(n1 int, n2 int) int {
+  	return n1 + n2
+  }
+  
+  // 函数既然是一种数据类型，因此在Go中，函数可以作为形参，并且调用
+  func myFun2(funvar myFunType, num1 int, num2 int) int {
+  	return funvar(num1, num2)
+  }
+  
+  
+  //看案例
+  res2 := myFun(getSum, 50, 60)
+  fmt.Println("res2=", res2)
+  ```
+
+  
 
 - go支持自定义数据类型
 
@@ -1090,9 +1247,35 @@ func main() {
 
 - 支持对函数返回值命名
 
+  ```go
+  // 支持对函数返回值命名
+  func getSumAndSub(n1 int, n2 int) (sum int, sub int) {
+  	sub = n1 - n2
+  	sum = n1 + n2
+  	return
+  }
+  ```
+
+  
+
 - 使用 _ 标识符，忽略返回值
 
 - go 支持可变参数
+
+  ```go
+  // 案例演示： 编写一个函数sum ,可以求出  1到多个int的和
+  // 可以参数的使用
+  func sum(n1 int, args ...int) int {
+  	sum := n1
+  	//遍历args
+  	for i := 0; i < len(args); i++ {
+  		sum += args[i] // args[0] 表示取出args切片的第一个元素值，其它依次类推
+  	}
+  	return sum
+  }
+  ```
+
+  
 
 #### init 函数
 
@@ -1409,11 +1592,25 @@ func main() {
 
 - 时间和日期相关函数，需要导入time包
 
-  
-
 - time.Time 类型，用于表示时间
 
 - 如何获取到其他的日期信息
+
+  ```go
+  // 看看日期和时间相关函数和方法使用
+  // 1. 获取当前时间
+  now := time.Now()
+  fmt.Printf("now=%v now type=%T\n", now, now)
+  
+  // 2.通过now可以获取到年月日，时分秒
+  fmt.Printf("年=%v\n", now.Year())
+  fmt.Printf("月=%v\n", now.Month())
+  fmt.Printf("月=%v\n", int(now.Month()))
+  fmt.Printf("日=%v\n", now.Day())
+  fmt.Printf("时=%v\n", now.Hour())
+  fmt.Printf("分=%v\n", now.Minute())
+  fmt.Printf("秒=%v\n", now.Second())
+  ```
 
 - 格式化日期时间
 
@@ -1608,8 +1805,10 @@ fmt.Println("strArr05=", strArr05)
 - for-range 结构遍历
 
 ```go
-for index, value := range array01 {
-    
+strArr05 := [...]string{1: "tom", 0: "jack", 2: "mary"}
+fmt.Println("strArr05=", strArr05)
+for i, v := range strArr05 {
+    fmt.Println(i, v)
 }
 ```
 
@@ -1653,8 +1852,6 @@ for _, val := range intArr2 {
 - 长度是数组类型的一部分，在传递参数时，需要考虑数组的长度
 
 ### 切片
-
-
 
 #### 切片的基本介绍
 
@@ -1913,6 +2110,45 @@ func main() {
 #### 冒泡排序
 ![image-20220313122314503](imgs\image-20220313122314503.png)
 
+```go
+// 冒泡排序
+func BubbleSort(arr *[5]int) {
+
+	fmt.Println("排序前arr=", (*arr))
+	temp := 0 //临时变量(用于做交换)
+
+	//冒泡排序..一步一步推导出来的
+	for i := 0; i < len(*arr)-1; i++ {
+
+		for j := 0; j < len(*arr)-1-i; j++ {
+			if (*arr)[j] > (*arr)[j+1] {
+				//交换
+				temp = (*arr)[j]
+				(*arr)[j] = (*arr)[j+1]
+				(*arr)[j+1] = temp
+			}
+		}
+
+	}
+
+	fmt.Println("排序后arr=", (*arr))
+
+}
+
+func main() {
+
+	// 定义数组
+	arr := [5]int{24, 69, 80, 57, 13}
+	// 将数组传递给一个函数，完成排序
+
+	BubbleSort(&arr)
+
+	fmt.Println("main arr=", arr) //有序? 是有序的
+}
+```
+
+
+
 ### 查找
 
 - 顺序查找
@@ -2103,6 +2339,8 @@ func main() {
 ## chapter09 map
 
 ### map 
+
+map 是key-value数据结构，又称为字段或者关联数组
 
 #### map的使用
 

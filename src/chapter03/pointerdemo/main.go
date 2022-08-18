@@ -18,7 +18,7 @@ func main() {
 	// 3. ptr 本身的值&i
 	var ptr *int = &i
 	fmt.Printf("ptr=%v\n", ptr)
-	fmt.Printf("ptr 的地址=%v", &ptr)
+	fmt.Printf("ptr 的地址=%v\n", &ptr)
 	fmt.Printf("ptr 指向的值=%v", *ptr)
 
 }

@@ -45,4 +45,7 @@ func main() {
 	// 类型推导
 	strArr05 := [...]string{1: "tom", 0: "jack", 2: "mary"}
 	fmt.Println("strArr05=", strArr05)
+	for i, v := range strArr05 {
+		fmt.Println(i, v)
+	}
 }
