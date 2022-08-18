@@ -19,7 +19,6 @@ func main() {
 	}
 	//及时关闭file句柄
 	defer file.Close()
-	//准备写入5句 "你好,尚硅谷!"
 	str := "你好,北京!\r\n" // \r\n 表示换行
 	//写入时，使用带缓存的 *Writer
 	writer := bufio.NewWriter(file)

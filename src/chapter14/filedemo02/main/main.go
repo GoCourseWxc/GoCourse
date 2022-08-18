@@ -35,7 +35,7 @@ func main() {
 			break
 		}
 		//输出内容
-		fmt.Printf(str)
+		fmt.Println(str)
 	}
 
 	fmt.Println("文件读取结束...")

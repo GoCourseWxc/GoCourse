@@ -3615,7 +3615,7 @@ func main() {
 
 #### 输入流和输出流
 
-#### ![image-20220315234555770](imgs\image-20220315234555770.png)
+![image-20220315234555770](imgs\image-20220315234555770.png)
 
 流： 数据在数据源(文件) 和 程序 (内存) 之间经历的路径
 
@@ -3654,7 +3654,476 @@ func main() {
 }
 ```
 
+#### 读文件操作应用实例
 
+- 读取文件的内容并显示在终端(带缓冲区的方式)，使用 os.Open()，file.close()，bufio.NewReader(), reader.ReadString 函数和方法
+
+  ```go
+  func main() {
+  	//打开文件
+  	//概念说明: file 的叫法
+  	//1. file 叫 file对象
+  	//2. file 叫 file指针
+  	//3. file 叫 file 文件句柄
+  	file, err := os.Open("d:/test.txt")
+  	if err != nil {
+  		fmt.Println("open file err=", err)
+  	}
+  
+  	//当函数退出时，要及时的关闭file
+  	defer file.Close() //要及时关闭file句柄，否则会有内存泄漏.
+  
+  	// 创建一个 *Reader  ，是带缓冲的
+  	/*
+  		const (
+  		defaultBufSize = 4096 //默认的缓冲区为4096
+  		)
+  	*/
+  	reader := bufio.NewReader(file)
+  	//循环的读取文件的内容
+  	for {
+  		str, err := reader.ReadString('\n') // 读到一个换行就结束
+  		if err == io.EOF {                  // io.EOF表示文件的末尾
+  			break
+  		}
+  		//输出内容
+  		fmt.Println(str)
+  	}
+  
+  	fmt.Println("文件读取结束...")
+  }
+  
+  ```
+
+- 读取文件的内容并显示在终端(使用ioutil一次将整个文件读入到内存中)，这种适用于文件不大的情况。相关方法和函数(ioutil.ReadFile())
+
+  ```go
+  func main() {
+  
+  	//使用ioutil.ReadFile一次性将文件读取到位
+  	file := "d:/test.txt"
+  	content, err := ioutil.ReadFile(file)
+  	if err != nil {
+  		fmt.Printf("read file err=%v", err)
+  	}
+  	//把读取到的内容显示到终端
+  	//fmt.Printf("%v", content) // []byte
+  	fmt.Printf("%v", string(content)) // []byte
+  
+  	//我们没有显式的Open文件，因此也不需要显式的Close文件
+  	//因为，文件的Open和Close被封装到 ReadFile 函数内部
+  }
+  ```
+
+
+
+
+
+#### 写文件操作应用实例
+
+#### 基本应用案例-方式一
+
+- 创建一个新文件，写入内容5句，"hello, Gardon"
+    ```go
+    func main() {
+    	//创建一个新文件，写入内容 5句 "hello, Gardon"
+    	//1 .打开文件 d:/abc.txt
+    	filePath := "d:/abc.txt"
+    	file, err := os.OpenFile(filePath, os.O_WRONLY|os.O_CREATE, 0666)
+    	if err != nil {
+    		fmt.Printf("open file err=%v\n", err)
+    		return
+    	}
+    	//及时关闭file句柄
+    	defer file.Close()
+    	//准备写入5句 "hello, Gardon"
+    	str := "hello,Gardon\r\n" // \r\n 表示换行
+    	//写入时，使用带缓存的 *Writer
+    	writer := bufio.NewWriter(file)
+    	for i := 0; i < 5; i++ {
+    		writer.WriteString(str)
+    	}
+    	//因为writer是带缓存，因此在调用WriterString方法时，其实
+    	//内容是先写入到缓存的,所以需要调用Flush方法，将缓冲的数据
+    	//真正写入到文件中， 否则文件中会没有数据!!!
+    	writer.Flush()
+    }
+    ```
+- 打开一个存在的文件中，将原来的内容覆盖成新的10句 "你好， 老王"
+    ```go
+    func main() {
+    	//打开一个存在的文件中，将原来的内容覆盖成新的内容10句 "你好，尚硅谷!"
+    
+    	//创建一个新文件，写入内容 5句 "hello, Gardon"
+    	//1 .打开文件已经存在文件, d:/abc.txt
+    	filePath := "d:/abc.txt"
+    	file, err := os.OpenFile(filePath, os.O_WRONLY|os.O_TRUNC, 0666)
+    	if err != nil {
+    		fmt.Printf("open file err=%v\n", err)
+    		return
+    	}
+    	//及时关闭file句柄
+    	defer file.Close()
+    	str := "你好,北京!\r\n" // \r\n 表示换行
+    	//写入时，使用带缓存的 *Writer
+    	writer := bufio.NewWriter(file)
+    	for i := 0; i < 10; i++ {
+    		writer.WriteString(str)
+    	}
+    	//因为writer是带缓存，因此在调用WriterString方法时，其实
+    	//内容是先写入到缓存的,所以需要调用Flush方法，将缓冲的数据
+    	//真正写入到文件中， 否则文件中会没有数据!!!
+    	writer.Flush()
+    
+    }
+    ```
+- 打开一个存在的文件，在原来的内容追加内容 "ABC,ENGLISH!"
+
+    ```go
+    func main() {
+    
+    	//打开一个存在的文件，在原来的内容追加内容 'ABC! ENGLISH!'
+    	//1 .打开文件已经存在文件, d:/abc.txt
+    	filePath := "d:/abc.txt"
+    	file, err := os.OpenFile(filePath, os.O_WRONLY|os.O_APPEND, 0666)
+    	if err != nil {
+    		fmt.Printf("open file err=%v\n", err)
+    		return
+    	}
+    	//及时关闭file句柄
+    	defer file.Close()
+    	//准备写入5句
+    	str := "ABC,ENGLISH!\r\n" // \r\n 表示换行
+    	//写入时，使用带缓存的 *Writer
+    	writer := bufio.NewWriter(file)
+    	for i := 0; i < 10; i++ {
+    		writer.WriteString(str)
+    	}
+    	//因为writer是带缓存，因此在调用WriterString方法时，其实
+    	//内容是先写入到缓存的,所以需要调用Flush方法，将缓冲的数据
+    	//真正写入到文件中， 否则文件中会没有数据!!!
+    	writer.Flush()
+    
+    }
+    ```
+- 打开一个存在的文件，将原来的内容读出显示在终端，并追加5句 "hello, 北京"
+    ```go
+    func main() {
+    
+    	//打开一个存在的文件，将原来的内容读出显示在终端，并且追加5句"hello,北京!"
+    	//1 .打开文件已经存在文件, d:/abc.txt
+    	filePath := "d:/abc.txt"
+    	file, err := os.OpenFile(filePath, os.O_RDWR|os.O_APPEND, 0666)
+    	if err != nil {
+    		fmt.Printf("open file err=%v\n", err)
+    		return
+    	}
+    	//及时关闭file句柄
+    	defer file.Close()
+    
+    	//先读取原来文件的内容，并显示在终端.
+    	reader := bufio.NewReader(file)
+    	for {
+    		str, err := reader.ReadString('\n')
+    		if err == io.EOF { //如果读取到文件的末尾
+    			break
+    		}
+    		//显示到终端
+    		fmt.Print(str)
+    	}
+    
+    	//准备写入5句
+    	str := "hello,北京!\r\n" // \r\n 表示换行
+    	//写入时，使用带缓存的 *Writer
+    	writer := bufio.NewWriter(file)
+    	for i := 0; i < 5; i++ {
+    		writer.WriteString(str)
+    	}
+    	//因为writer是带缓存，因此在调用WriterString方法时，其实
+    	//内容是先写入到缓存的,所以需要调用Flush方法，将缓冲的数据
+    	//真正写入到文件中， 否则文件中会没有数据!!!
+    	writer.Flush()
+    
+    }
+    ```
+#### 基本应用实例-方式二
+编写一个程序，将一个文件的内容，写入到另一个文件。
+    ```go
+    func main() {
+    	//将d:/abc.txt 文件内容导入到  e:/kkk.txt
+    	//1. 首先将  d:/abc.txt 内容读取到内存
+    	//2. 将读取到的内容写入 e:/kkk.txt
+    	file1Path := "d:/abc.txt"
+    	file2Path := "e:/kkk.txt"
+    	data, err := ioutil.ReadFile(file1Path)
+    	if err != nil {
+    		//说明读取文件有错误
+    		fmt.Printf("read file err=%v\n", err)
+    		return
+    	}
+    	err = ioutil.WriteFile(file2Path, data, 0666)
+    	if err != nil {
+    		fmt.Printf("write file error=%v\n", err)
+    	}
+    }
+
+    ```
+    
+#### 判断文件是否存在
+golang判断文件或文件夹是否存在的方法为使用os.Stat()函数返回的错误值进行判断
+- 如果返回的错误为nil, 说明文件或文件夹存在
+- 如果返回的错误类型使用os.IsNotExist()判断为true,说明文件或文件夹不存在
+- 如果返回的错误为其他类型，则不确定是否再存在
+```go
+
+
+```
+### 文件编程应用案例
+#### 拷贝文件
+func Copy(dst Writer, src Reader) (writer int64, err error)
+```go
+//自己编写一个函数，接收两个文件路径 srcFileName dstFileName
+func CopyFile(dstFileName string, srcFileName string) (written int64, err error) {
+
+	srcFile, err := os.Open(srcFileName)
+	if err != nil {
+		fmt.Printf("open file err=%v\n", err)
+	}
+	defer srcFile.Close()
+	//通过srcfile ,获取到 Reader
+	reader := bufio.NewReader(srcFile)
+
+	//打开dstFileName
+	dstFile, err := os.OpenFile(dstFileName, os.O_WRONLY|os.O_CREATE, 0666)
+	if err != nil {
+		fmt.Printf("open file err=%v\n", err)
+		return
+	}
+
+	//通过dstFile, 获取到 Writer
+	writer := bufio.NewWriter(dstFile)
+	defer dstFile.Close()
+
+	return io.Copy(writer, reader)
+
+}
+
+func main() {
+
+	//将d:/flower.jpg 文件拷贝到 e:/abc.jpg
+
+	//调用CopyFile 完成文件拷贝
+	srcFile := "d:/flower.jpg"
+	dstFile := "e:/abc.jpg"
+	_, err := CopyFile(dstFile, srcFile)
+	if err == nil {
+		fmt.Printf("拷贝完成\n")
+	} else {
+		fmt.Printf("拷贝错误 err=%v\n", err)
+	}
+
+}
+```
+#### 统计英文、数字、空格和其他字符数量
+```go
+
+//定义一个结构体，用于保存统计结果
+type CharCount struct {
+	ChCount    int // 记录英文个数
+	NumCount   int // 记录数字的个数
+	SpaceCount int // 记录空格的个数
+	OtherCount int // 记录其它字符的个数
+}
+
+func main() {
+
+	//思路: 打开一个文件, 创一个Reader
+	//每读取一行，就去统计该行有多少个 英文、数字、空格和其他字符
+	//然后将结果保存到一个结构体
+	fileName := "e:/abc.txt"
+	file, err := os.Open(fileName)
+	if err != nil {
+		fmt.Printf("open file err=%v\n", err)
+		return
+	}
+	defer file.Close()
+	//定义个CharCount 实例
+	var count CharCount
+	//创建一个Reader
+	reader := bufio.NewReader(file)
+
+	//开始循环的读取fileName的内容
+	for {
+		str, err := reader.ReadString('\n')
+		if err == io.EOF { //读到文件末尾就退出
+			break
+		}
+		//遍历 str ，进行统计
+		for _, v := range str {
+
+			switch {
+			case v >= 'a' && v <= 'z':
+				fallthrough //穿透
+			case v >= 'A' && v <= 'Z':
+				count.ChCount++
+			case v == ' ' || v == '\t':
+				count.SpaceCount++
+			case v >= '0' && v <= '9':
+				count.NumCount++
+			default:
+				count.OtherCount++
+			}
+		}
+	}
+
+	//输出统计的结果看看是否正确
+	fmt.Printf("字符的个数为=%v 数字的个数为=%v 空格的个数为=%v 其它字符个数=%v",
+		count.ChCount, count.NumCount, count.SpaceCount, count.OtherCount)
+
+}
+
+```
+### 命令行参数
+#### 基本介绍
+os.Args 是一个 string的切片，用来存储所有的命令行参数
+
+```bash
+test.exe -u -root -pwd 123456 -h 192.168.1.15 -port 3306
+```
+
+```go
+func main() {
+
+	fmt.Println("命令行的参数有", len(os.Args))
+	//遍历os.Args切片，就可以得到所有的命令行输入参数值
+	for i, v := range os.Args {
+		fmt.Printf("args[%v]=%v\n", i, v)
+	}
+}
+```
+### json 基本介绍
+https//www.json.cn/ 网站可以验证json格式
+#### json的序列化
+json序列化是指，将有key-value结构的数据类型(结构体、map、切片)序列化成json字符串的操作。
+介绍一下结构体、map和切片的序列化，其他数据类型的序列化类似
+```go
+	if err != nil {
+		fmt.Println("open file err=", err)
+	}
+
+	//当函数退出时，要及时的关闭file
+	defer file.Close() //要及时关闭file句柄，否则会有内存泄漏.
+
+	// 创建一个 *Reader  ，是带缓冲的
+	/*
+		const (
+		defaultBufSize = 4096 //默认的缓冲区为4096
+		)
+	*/
+	reader := bufio.NewReader(file)
+	//循环的读取文件的内容
+	for {
+		str, err := reader.ReadString('\n') // 读到一个换行就结束
+		if err == io.EOF {                  // io.EOF表示文件的末尾
+			break
+		}
+		//输出内容
+		fmt.Println(str)
+	}
+
+	fmt.Println("文件读取结束...")
+}
+```
+#### json的反序列化
+json反序列化是指，将json字符串反序列化成对应的数据类型
+```go
+//定义一个结构体
+type Monster struct {
+	Name     string
+	Age      int
+	Birthday string //....
+	Sal      float64
+	Skill    string
+}
+
+//演示将json字符串，反序列化成struct
+func unmarshalStruct() {
+	//说明str 在项目开发中，是通过网络传输获取到.. 或者是读取文件获取到
+	str := "{\"Name\":\"牛魔王~~~\",\"Age\":500,\"Birthday\":\"2011-11-11\",\"Sal\":8000,\"Skill\":\"牛魔拳\"}"
+
+	//定义一个Monster实例
+	var monster Monster
+
+	err := json.Unmarshal([]byte(str), &monster)
+	if err != nil {
+		fmt.Printf("unmarshal err=%v\n", err)
+	}
+	fmt.Printf("反序列化后 monster=%v monster.Name=%v \n", monster, monster.Name)
+
+}
+
+//将map进行序列化
+func testMap() string {
+	//定义一个map
+	var a map[string]interface{}
+	//使用map,需要make
+	a = make(map[string]interface{})
+	a["name"] = "红孩儿~~~~~~"
+	a["age"] = 30
+	a["address"] = "洪崖洞"
+
+	//将a这个map进行序列化
+	//将monster 序列化
+	data, err := json.Marshal(a)
+	if err != nil {
+		fmt.Printf("序列化错误 err=%v\n", err)
+	}
+	//输出序列化后的结果
+	//fmt.Printf("a map 序列化后=%v\n", string(data))
+	return string(data)
+
+}
+
+//演示将json字符串，反序列化成map
+func unmarshalMap() {
+	//str := "{\"address\":\"洪崖洞\",\"age\":30,\"name\":\"红孩儿\"}"
+	str := testMap()
+	//定义一个map
+	var a map[string]interface{}
+
+	//反序列化
+	//注意：反序列化map,不需要make,因为make操作被封装到 Unmarshal函数
+	err := json.Unmarshal([]byte(str), &a)
+	if err != nil {
+		fmt.Printf("unmarshal err=%v\n", err)
+	}
+	fmt.Printf("反序列化后 a=%v\n", a)
+
+}
+
+//演示将json字符串，反序列化成切片
+func unmarshalSlice() {
+	str := "[{\"address\":\"北京\",\"age\":\"7\",\"name\":\"jack\"}," +
+		"{\"address\":[\"墨西哥\",\"夏威夷\"],\"age\":\"20\",\"name\":\"tom\"}]"
+
+	//定义一个slice
+	var slice []map[string]interface{}
+	//反序列化，不需要make,因为make操作被封装到 Unmarshal函数
+	err := json.Unmarshal([]byte(str), &slice)
+	if err != nil {
+		fmt.Printf("unmarshal err=%v\n", err)
+	}
+	fmt.Printf("反序列化后 slice=%v\n", slice)
+}
+
+func main() {
+
+	unmarshalStruct()
+	unmarshalMap()
+	unmarshalSlice()
+}
+
+```
 
 ## chapter15 单元测试
 
