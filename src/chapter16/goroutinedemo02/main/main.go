@@ -13,18 +13,18 @@ var (
 
 func test(n int) {
 	res := 1
-	for i := 0; i <= n; i++ {
+	for i := 1; i <= n; i++ {
 		res *= i
 	}
 	myMap[n] = res
 }
 
 func main() {
-	for i := 0; i <= 200; i++ {
+	for i := 0; i <= 10; i++ {
 		go test(i)
 	}
-	time.Sleep(time.Second)
+	time.Sleep(10 * time.Second)
 	for k, v := range myMap {
-		fmt.Println("map[%d]=%d", k, v)
+		fmt.Printf("map[%d]=%d\n", k, v)
 	}
 }
