@@ -33,11 +33,11 @@ func (this *Monster) Store() bool {
 	return true
 }
 
-//给Monster绑定方法ReStore, 可以将一个序列化的Monster,从文件中读取，
-//并反序列化为Monster对象,检查反序列化，名字正确
+// 给Monster绑定方法ReStore, 可以将一个序列化的Monster,从文件中读取，
+// 并反序列化为Monster对象,检查反序列化，名字正确
 func (this *Monster) ReStore() bool {
 
-	//1. 先从文件中，读取序列化的字符串
+	// 1. 先从文件中，读取序列化的字符串
 	filePath := "d:/monster.ser"
 	data, err := ioutil.ReadFile(filePath)
 	if err != nil {
@@ -45,7 +45,7 @@ func (this *Monster) ReStore() bool {
 		return false
 	}
 
-	//2.使用读取到data []byte ,对反序列化
+	// 2.使用读取到data []byte ,对反序列化
 	err = json.Unmarshal(data, this)
 	if err != nil {
 		fmt.Println("UnMarshal err =", err)
